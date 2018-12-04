@@ -48,72 +48,53 @@
 
 # What is the ID of the guard you chose multiplied by the minute you chose? (In the above example, the answer would be 10 * 24 = 240.)
 
-from statistics import mode, StatisticsError
+from collections import Counter, defaultdict
+import operator
 
-puzzle_input = open('day4.txt', 'r')
-puzzle_input = puzzle_input.read()
-puzzle_input = puzzle_input.split('\n')
-puzzle_input.sort()
-
-guards_sleep_logs = {}
+with open('day4.txt') as puzzle_file:
+    puzzle_input = sorted(line.strip() for line in puzzle_file)
 
 def organize_by_day(entries):
-    organize_by_day = []
+    logs_by_day = []
     day_log = []
     for entry in entries:
-        if 'Guard' in entry and day_log != []:
-            organize_by_day.append(day_log)
+        if 'Guard' in entry and day_log:
+            logs_by_day.append(day_log)
             day_log = []
         day_log.append(entry)
-    organize_by_day.append(day_log)
-    return organize_by_day
+    if day_log:
+        logs_by_day.append(day_log)
+    return logs_by_day
 
 def organize_by_guard(entries_by_day):
+    guard_sleep_logs = defaultdict(list)
     for day in entries_by_day:
-        guard = day[0][day[0].index('#') + 1:day[0].index('b') - 1]
-        for entry in day:
-            if 'Guard' not in entry:
-                if guard in guards_sleep_logs.keys():
-                    guards_sleep_logs[guard].append(int(entry[entry.index(':') + 1:entry.index(']')]))
-                else:
-                    guards_sleep_logs[guard] = [int(entry[entry.index(':') + 1:entry.index(']')])]
-
-organize_by_guard(organize_by_day(puzzle_input))
-
-guards_mins_asleep = {}
+        guard = int(day[0].split()[3].lstrip('#'))
+        for entry in day[1:]:
+            guard_sleep_logs[guard].append(int(entry[15:17]))
+    return guard_sleep_logs
 
 def find_guard_mins_asleep(guards):
+    guards_mins_asleep = {}
     for guard, times in guards.items():
-        mins_asleep = 0
-        for i in range(0, len(times), 2):
-            mins_asleep += times[i + 1] - times[i]
-        guards_mins_asleep[guard] = mins_asleep
-
-find_guard_mins_asleep(guards_sleep_logs)
+        guards_mins_asleep[guard] = sum(end - start for start, end in zip(times[0::2], times[1::2]))
+    return guards_mins_asleep
 
 def find_guard_most_asleep(guards):
-    most_mins_asleep = max(guards.values())
-    for key, value in guards.items():
-        if value == most_mins_asleep:
-            return key, value
+    return max(guards.items(), key=operator.itemgetter(1))
 
+def find_min_most_likely_asleep(times):
+    counter = Counter()
+    for start, end in zip(times[0::2], times[1::2]):
+        counter.update(range(start, end))
+    return next(iter(counter.most_common(1)), (0, 0))
+
+guards_sleep_logs = organize_by_guard(organize_by_day(puzzle_input))
+guards_mins_asleep = find_guard_mins_asleep(guards_sleep_logs)
 guard_of_choice, mins_asleep = find_guard_most_asleep(guards_mins_asleep)
+min_of_choice, times_asleep = find_min_most_likely_asleep(guards_sleep_logs[guard_of_choice])
 
-def find_min_most_likely_asleep(guard, guard_log):
-    minutes = []
-    for i in range(0, len(guard_log[guard]), 2):
-        counter = guard_log[guard][i]
-        while counter < guard_log[guard][i + 1]:
-            minutes.append(counter)
-            counter += 1
-    try:
-        return mode(minutes), minutes.count(mode(minutes))
-    except StatisticsError:
-        return 0, 0
-
-min_of_choice, times_asleep = find_min_most_likely_asleep(guard_of_choice, guards_sleep_logs)
-
-print int(guard_of_choice) * min_of_choice # Your puzzle answer was 12504.
+print guard_of_choice * min_of_choice # Your puzzle answer was 12504.
 
 # --- Part Two ---
 # Strategy 2: Of all guards, which guard is most frequently asleep on the same minute?
@@ -123,15 +104,15 @@ print int(guard_of_choice) * min_of_choice # Your puzzle answer was 12504.
 # What is the ID of the guard you chose multiplied by the minute you chose? (In the above example, the answer would be 99 * 45 = 4455.)
 
 def strategy_2(guard_log):
-    guard_of_choice = ''
-    min_of_choice = 0
+    guard_of_choice = None
+    min_of_choice = None
     times_asleep = 0
-    for guard in guard_log.keys():
-        minute, times = find_min_most_likely_asleep(guard, guard_log)
+    for guard, sleep_log in guard_log.items():
+        minute, times = find_min_most_likely_asleep(sleep_log)
         if times > times_asleep:
             times_asleep = times
             guard_of_choice = guard
             min_of_choice = minute
-    return int(guard_of_choice) * min_of_choice
+    return guard_of_choice * min_of_choice
         
 print strategy_2(guards_sleep_logs) # Your puzzle answer was 139543.
