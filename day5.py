@@ -21,24 +21,24 @@
 
 # How many units remain after fully reacting the polymer you scanned? (Note: in this puzzle and others, the input is large; if you copy/paste your input, make sure you get the whole thing.)
 
-puzzle_input = open('day5.txt', 'r')
-puzzle_input = puzzle_input.read()
+with open('day5.txt') as puzzle_file:
+    puzzle_input = puzzle_file.read().strip()
 
 test_input = 'dabAcCaCBAcCcaDA'
 
 def react(polymer):
-    for i in range(len(polymer) - 2):
-        if (polymer[i].islower() and polymer[i + 1] == polymer[i].upper()) or (polymer[i].isupper() and polymer[i + 1] == polymer[i].lower()):
+    i = 0
+    while i < len(polymer) - 1:
+        a, b = polymer[i:i + 2]
+        if a != b and a.lower() == b.lower():
             polymer = polymer[:i] + polymer[i + 2:]
-            return polymer
-    return polymer
-
-def fully_react(polymer):
-    while polymer != react(polymer):
-        polymer = react(polymer)
+            if i > 0:
+                i -= 1
+        else:
+            i += 1
     return len(polymer)
-    
-# print fully_react(puzzle_input) # Your puzzle answer was 11152.
+
+print react(puzzle_input) # Your puzzle answer was 11152.
 
 # --- Part Two ---
 # Time to improve the polymer.
@@ -56,11 +56,9 @@ def fully_react(polymer):
 # What is the length of the shortest polymer you can produce by removing all units of exactly one type and fully reacting the result?
 
 def improved_react(polymer, letter):
-    while letter in polymer:
-        polymer = polymer.replace(letter, '')
-    while letter.upper() in polymer:
-        polymer = polymer.replace(letter.upper(), '')
-    return fully_react(polymer)
+    polymer = polymer.replace(letter, '')
+    polymer = polymer.replace(letter.upper(), '')
+    return react(polymer)
 
 def find_shortest_polymer(polymer):
     shortest_len = len(polymer)
