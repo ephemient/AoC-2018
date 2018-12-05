@@ -31,3 +31,27 @@ I'm definitely solving these much faster than last year. Before, I always came u
 ## Day 4
 
 I spent a little under 2 hours solving day 4, most of it spent on part 1. I was mostly focused on getting it done with intent to make it better the next day after more sleep. I kept thinking that my solution, while it works, was pretty terrible because I felt like I could have done it in much less code. Daniel looked at it the next morning and offered [these changes](https://github.com/ephemient/AoC-2018/blob/patch-1/day4.py), which mostly kept my structure but made more Pythonic. So much to learn from here! I vaguely remember D teaching me defaultdict last AoC but because I haven't really used it in a year, I forgot about it. What Counter can do is pretty cool. Also, looking at my code again the next day, it's not actually as much code as I remembered. I recognize that I get imposter syndrome a lot due to the fact that I never learned this stuff formally and I should stop thinking that I barely know anything (while keeping in mind that there IS a ton more to learn).
+
+## Day 5
+
+This day's puzzle was particularly frustrating. It didn't take me long to figure 90% of the code of each part, but took significantly longer to tweak the other 10% to actually make it work. Then my original solution took SO long. The next morning, I used inspiration from Part 2 to rewrite Part 1 so that I can get my solutions much quicker than before, but still super slow. Gotta keep thinking. D did offer me a solution, but I don't want to use his, obviously. I want to see if I can come up with one on my own that will achieve the same results.
+
+Part 1 v1
+
+    real    1m13.034s
+    user    1m12.384s
+    sys     0m0.100s
+
+Part 2 v1 - I called it quits after waiting for over half an hour, but I assume it's around the time it takes to do Part 1 x 26.
+
+Part 1 v2
+
+    real    0m2.825s
+    user    0m2.808s
+    sys     0m0.012s
+
+Part 2 v2
+
+    real    1m17.145s
+    user    1m16.908s
+    sys     0m0.060s

@@ -30,7 +30,7 @@ def react(polymer):
     i = 0
     while i < len(polymer) - 1:
         a, b = polymer[i:i + 2]
-        if a != b and a.lower() == b.lower():
+        if a == b.swapcase():
             polymer = polymer[:i] + polymer[i + 2:]
             if i > 0:
                 i -= 1
@@ -67,4 +67,4 @@ def find_shortest_polymer(polymer):
         shortest_len = min(improved_react(polymer, letter), shortest_len)
     return shortest_len
 
-print find_shortest_polymer(puzzle_input)
+print find_shortest_polymer(react(puzzle_input)) # Your puzzle answer was 6136.
